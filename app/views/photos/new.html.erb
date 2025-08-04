@@ -1,0 +1,25 @@
+<h1>写真アップロード</h1>
+
+<%= form_with model: @photo, local: true do |f| %>
+  <div>
+    <%= f.label :title %>
+    <%= f.text_field :title %>
+  </div>
+  <div>
+    <%= f.label :image %>
+    <%= f.file_field :image %>
+  </div>
+  <%= f.submit "アップロード" %>
+<% end %>
+
+<%= link_to "キャンセル", photos_path %>
+<%= link_to "ログアウト", logout_path, method: :delete, data: { confirm: "ログアウトしますか？" } %>
+
+
+<% if @photo.errors.any? %>
+  <ul>
+    <% @photo.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+  </ul>
+<% end %>

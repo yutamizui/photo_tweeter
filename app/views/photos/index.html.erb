@@ -1,0 +1,11 @@
+<h1>あなたの写真一覧</h1>
+<%= link_to "写真をアップロード", new_photo_path %>
+<%= link_to "ログアウト", logout_path, method: :delete, data: { confirm: "ログアウトしますか？" } %>
+
+<% @photos.each do |photo| %>
+  <div>
+    <h3><%= photo.title %></h3>
+    <%= image_tag photo.image %>
+    <%= link_to "削除", photo_path(photo), method: :delete, data: { confirm: "この写真を削除しますか？" } %>
+  </div>
+<% end %>
