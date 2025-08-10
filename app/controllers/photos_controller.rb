@@ -24,6 +24,52 @@ class PhotosController < ApplicationController
     redirect_to photos_path, notice: "写真を削除しました"
   end
 
+    # app/controllers/photos_controller.rb
+  require "net/http"
+  require "uri"
+  require "json"
+
+  def tweet
+    access_token = session[:tweet_access_token]
+    return redirect_to(photos_path, alert: "まずは外部アプリと連携してください") unless access_token.present?
+
+    photo = current_user.photos.find(params[:id])
+    return redirect_to(photos_path, alert: "画像が添付されていません") unless photo.image.attached?
+
+    # rails_blob_urlが使えるように development.rb に host 設定が必要:
+    # Rails.application.routes.default_url_options[:host] = "localhost:3000"
+    image_url = rails_blob_url(photo.image)
+
+    uri  = URI.parse("http://unifa-recruit-my-tweet-app.ap-northeast-1.elasticbeanstalk.com/api/tweets")
+    http = Net::HTTP.new(uri.host, uri.port)
+    req  = Net::HTTP::Post.new(uri.request_uri, {
+      "Authorization" => "Bearer #{access_token}",
+      "Content-Type"  => "application/json"
+    })
+    req.body = { text: photo.title, url: image_url }.to_json
+
+    Rails.logger.info("[TWEET] POST #{uri} body=#{req.body}")
+
+    begin
+      res = http.request(req)
+      Rails.logger.info("[TWEET] status=#{res.code} body=#{res.body}")
+
+      if res.code.to_i == 201
+        redirect_to photos_path, notice: "ツイートしました"
+      elsif res.code.to_i == 401
+        session.delete(:tweet_access_token)
+        redirect_to photos_path, alert: "認証エラーです。もう一度連携してください（401）"
+      else
+        redirect_to photos_path, alert: "ツイートに失敗しました（#{res.code}）"
+      end
+    rescue => e
+      Rails.logger.error("[TWEET] error=#{e.class} #{e.message}")
+      redirect_to photos_path, alert: "ツイート送信中にエラーが発生しました"
+    end
+  end
+
+
+
   private
 
   def photo_params
