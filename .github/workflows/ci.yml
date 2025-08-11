@@ -100,7 +100,8 @@ jobs:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
           CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
           # テスト用ダミー値（本番は Secrets を利用）
-          OAUTH_TOKEN_URL: "https://example.test/oauth/token"
+          OAUTH_TOKEN_URL: "https://example.com/oauth/token"
+          OAUTH_REDIRECT_URI: "http://example.com/oauth/callback"
           OAUTH_CLIENT_ID: "dummy"
           OAUTH_CLIENT_SECRET: "dummy"
         run: |

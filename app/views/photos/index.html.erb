@@ -20,8 +20,6 @@
           <%= button_to "ツイートする", tweet_photo_path(photo), method: :post %>
         <% end %>
       </div>
-
-      <%= link_to "削除", photo_path(photo), method: :delete, data: { confirm: "この写真を削除しますか？" } %>
     </div>
   <% end %>
 </div>

@@ -27,12 +27,6 @@ class PhotosController < ApplicationController
     end
   end
 
-  # def destroy
-  #   photo = current_user.photos.find(params[:id])
-  #   photo.destroy
-  #   redirect_to photos_path, notice: "写真を削除しました"
-  # end
-
   def tweet
     access_token = session[:tweet_access_token]
     return redirect_to(photos_path, alert: "まずは外部アプリと連携してください") unless access_token.present?
