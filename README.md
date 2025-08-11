@@ -9,8 +9,7 @@
 - macOS (arm64)
 
 ### 初回セットアップ
-```bash
-# Ruby を合わせる（rbenv/asdf を使っている場合）
+# Ruby を合わせる
 rbenv local 3.3.0 || true
 
 # 依存関係インストール
