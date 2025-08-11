@@ -1,14 +1,20 @@
 <h1>ログイン</h1>
-<% if flash[:alert] %>
-  <p style="color: red;"><%= flash[:alert] %></p>
+
+<% if @errors.present? %>
+  <ul style="color: red; margin: 8px 0;">
+    <% @errors.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+  </ul>
 <% end %>
-<%= form_with url: login_path, method: :post do %>
+
+<%= form_with url: login_path, method: :post, local: true, data: { turbo: false } do %>
   <div>
     <%= label_tag :user_id, "ユーザーID" %>
-    <%= text_field_tag :user_id %>
+    <%= text_field_tag :user_id, @user_id %>
   </div>
   <div>
-    <%= label_tag :passowrd, "パスワード" %>
+    <%= label_tag :password, "パスワード" %>
     <%= password_field_tag :password %>
   </div>
   <%= submit_tag "ログイン" %>

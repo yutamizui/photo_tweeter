@@ -1,21 +1,27 @@
-<h1>あなたの写真一覧</h1>
+<%= link_to "ログアウト", logout_path, method: :delete, data: { confirm: "ログアウトしますか？" } %>
+<h1>写真一覧</h1>
 <% unless session[:tweet_access_token].present? %>
   <p>
-    <%= link_to "Twitterに連携する", oauth_authorize_url, rel: "noopener" %>
+    <%= link_to "MyTweetAppと連携", oauth_authorize_url, rel: "noopener" %>
   </p>
 <% else %>
   <p>連携済み</p>
 <% end %>
-<%= link_to "写真をアップロード", new_photo_path %>
-<%= link_to "ログアウト", logout_path, method: :delete, data: { confirm: "ログアウトしますか？" } %>
+<%= link_to "写真を新規にアップロード", new_photo_path %>
 
-<% @photos.each do |photo| %>
-  <div>
-    <h3><%= photo.title %></h3>
-    <%= image_tag photo.image %><br>
+<div class="photos-grid">
+  <% @photos.each do |photo| %>
+    <div class="photo-card">
+      <h3><%= photo.title %></h3>
+      <%= image_tag photo.image %><br>
 
-    <% if session[:tweet_access_token].present? %>
-      <%= button_to "ツイートする", tweet_photo_path(photo), method: :post %>
-    <% end %>
-  </div>
-<% end %>
+      <div class="photo-actions">
+        <% if session[:tweet_access_token].present? %>
+          <%= button_to "ツイートする", tweet_photo_path(photo), method: :post %>
+        <% end %>
+      </div>
+
+      <%= link_to "削除", photo_path(photo), method: :delete, data: { confirm: "この写真を削除しますか？" } %>
+    </div>
+  <% end %>
+</div>

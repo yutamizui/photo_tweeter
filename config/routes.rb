@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   root "sessions#new"
 
-  resources :photos, only: [:index, :new, :create, :destroy] do
+  resources :photos, only: [:index, :show, :new, :create, :destroy] do
     post :tweet, on: :member
   end
 

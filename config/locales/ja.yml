@@ -1,0 +1,15 @@
+ja:
+  activerecord:
+    models:
+      photo: 写真
+    attributes:
+      login_form:
+        user_id: ユーザーID
+        password: パスワード
+      photo:
+        title: タイトル
+        image: 画像ファイル
+  errors:
+    format: "%{attribute}%{message}"
+    messages:
+      blank: "を入力してください"

@@ -1,8 +1,17 @@
+require "net/http"
+require "uri"
+require "json"
+
 class PhotosController < ApplicationController
   before_action :require_login
 
   def index
     @photos = current_user.photos.order(created_at: :desc)
+  end
+
+  def show
+    photo = Photo.find(params[:id])
+    redirect_to rails_blob_url(photo.image)
   end
 
   def new
@@ -14,20 +23,15 @@ class PhotosController < ApplicationController
     if @photo.save
       redirect_to photos_path
     else
-    render :new
+      render :new, status: :ok
     end
   end
 
-  def destroy
-    photo = current_user.photos.find(params[:id])
-    photo.destroy
-    redirect_to photos_path, notice: "写真を削除しました"
-  end
-
-    # app/controllers/photos_controller.rb
-  require "net/http"
-  require "uri"
-  require "json"
+  # def destroy
+  #   photo = current_user.photos.find(params[:id])
+  #   photo.destroy
+  #   redirect_to photos_path, notice: "写真を削除しました"
+  # end
 
   def tweet
     access_token = session[:tweet_access_token]
@@ -36,11 +40,9 @@ class PhotosController < ApplicationController
     photo = current_user.photos.find(params[:id])
     return redirect_to(photos_path, alert: "画像が添付されていません") unless photo.image.attached?
 
-    # rails_blob_urlが使えるように development.rb に host 設定が必要:
-    # Rails.application.routes.default_url_options[:host] = "localhost:3000"
-    image_url = rails_blob_url(photo.image)
+    image_url = photo_url(photo, format: :jpg)
 
-    uri  = URI.parse("http://unifa-recruit-my-tweet-app.ap-northeast-1.elasticbeanstalk.com/api/tweets")
+    uri  = URI.parse(ENV.fetch("TWEET_API_URL"))
     http = Net::HTTP.new(uri.host, uri.port)
     req  = Net::HTTP::Post.new(uri.request_uri, {
       "Authorization" => "Bearer #{access_token}",
@@ -67,8 +69,6 @@ class PhotosController < ApplicationController
       redirect_to photos_path, alert: "ツイート送信中にエラーが発生しました"
     end
   end
-
-
 
   private
 

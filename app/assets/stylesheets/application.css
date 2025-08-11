@@ -8,3 +8,48 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+
+ /* 写真レイアウト */
+.photos-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.photo-card img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.photo-actions {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.photo-actions form {
+  display: inline-block;
+}
+
+/* フォームレイアウト */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-actions {
+  margin-top: 20px;
+}
+
+.cancel-link {
+  margin-left: 10px;
+}
+
+
+/* エラーメッセージ */
+.error-messages {
+  color: rgb(255, 0, 0);
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin: 15px 0;
+}
