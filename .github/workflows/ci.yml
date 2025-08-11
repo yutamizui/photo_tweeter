@@ -37,7 +37,6 @@ jobs:
         run: bundle exec importmap audit
 
   lint:
-    # .rubocop.yml が無い場合はスキップ
     if: ${{ hashFiles('.rubocop.yml') != '' }}
     runs-on: ubuntu-latest
     steps:
@@ -80,7 +79,6 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
-      # 安定した Chrome セットアップ
       - name: Setup Chrome
         id: setup-chrome
         uses: browser-actions/setup-chrome@v1
@@ -90,6 +88,9 @@ jobs:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
           CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
+          OAUTH_TOKEN_URL: "https://example.test/oauth/token"
+          OAUTH_CLIENT_ID: "dummy"
+          OAUTH_CLIENT_SECRET: "dummy"
         run: |
           bundle exec rails db:test:prepare
           bundle exec rails test
