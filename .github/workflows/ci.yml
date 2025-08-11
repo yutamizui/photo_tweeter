@@ -37,19 +37,30 @@ jobs:
         run: bundle exec importmap audit
 
   lint:
-    if: ${{ hashFiles('.rubocop.yml') != '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # .rubocop.yml の有無をチェック
+      - name: Check RuboCop config
+        id: rubocop_cfg
+        run: |
+          if [ -f .rubocop.yml ]; then
+            echo "present=true" >> $GITHUB_OUTPUT
+          else
+            echo "present=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Set up Ruby
+        if: ${{ steps.rubocop_cfg.outputs.present == 'true' }}
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
           bundler-cache: true
 
       - name: Lint code for consistent style
+        if: ${{ steps.rubocop_cfg.outputs.present == 'true' }}
         run: bundle exec rubocop -f github
 
   test:
@@ -88,6 +99,7 @@ jobs:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
           CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
+          # テスト用ダミー値（本番は Secrets を利用）
           OAUTH_TOKEN_URL: "https://example.test/oauth/token"
           OAUTH_CLIENT_ID: "dummy"
           OAUTH_CLIENT_SECRET: "dummy"
