@@ -6,7 +6,7 @@ class OauthController < ApplicationController
   def callback
     code = params[:code]
     if code.blank?
-      redirect_to photos_path, alert: "認証コードが見つかりませんでした"
+      return redirect_to photos_path, alert: "認証コードが見つかりませんでした"
     end
 
     uri = URI.parse(ENV.fetch("OAUTH_TOKEN_URL"))
