@@ -1,7 +1,3 @@
-require "net/http"
-require "uri"
-require "json"
-
 class PhotosController < ApplicationController
   before_action :require_login
 
@@ -29,34 +25,19 @@ class PhotosController < ApplicationController
 
   def tweet
     access_token = session[:tweet_access_token]
-    return redirect_to(photos_path, alert: "まずは外部アプリと連携してください") unless access_token.present?
-
     photo = current_user.photos.find(params[:id])
     return redirect_to(photos_path, alert: "画像が添付されていません") unless photo.image.attached?
-
     image_url = photo_url(photo, format: :jpg)
 
-    uri  = URI.parse(ENV.fetch("TWEET_API_URL"))
-    http = Net::HTTP.new(uri.host, uri.port)
-    req  = Net::HTTP::Post.new(uri.request_uri, {
-      "Authorization" => "Bearer #{access_token}",
-      "Content-Type"  => "application/json"
-    })
-    req.body = { text: photo.title, url: image_url }.to_json
-
-    Rails.logger.info("[TWEET] POST #{uri} body=#{req.body}")
-
     begin
-      res = http.request(req)
-      Rails.logger.info("[TWEET] status=#{res.code} body=#{res.body}")
-
-      if res.code.to_i == 201
+      tweet_client = UnifaApi.new(access_token)
+      Rails.logger.info("34-Access_token: #{access_token}")
+      res = tweet_client.tweet({ text: photo.title, url: image_url })
+      Rails.logger.info("[TWEET] response=#{res.inspect}")
+      if res.is_a?(Net::HTTPSuccess)
         redirect_to photos_path, notice: "ツイートしました"
-      elsif res.code.to_i == 401
-        session.delete(:tweet_access_token)
-        redirect_to photos_path, alert: "認証エラーです。もう一度連携してください（401）"
       else
-        redirect_to photos_path, alert: "ツイートに失敗しました（#{res.code}）"
+        raise "ツイートに失敗しました（#{res.code}）"
       end
     rescue => e
       Rails.logger.error("[TWEET] error=#{e.class} #{e.message}")
@@ -74,9 +55,5 @@ class PhotosController < ApplicationController
     unless current_user
       redirect_to login_path
     end
-  end
-
-  def current_user
-    @current_user ||= User.find_by(id: session[:user_id])
   end
 end
